@@ -1,0 +1,185 @@
+<script type="text/javascript">
+    localStorage.clear();
+</script>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>B.O.L.T Pro Vitals </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="./assets/scripts/jquery.min.js" async></script>  -->
+    <link href="./bolt.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container app-theme-white body-tabs-shadow">
+        <div class="app-container">
+            <div class="h-100 bg-plum-plate bg-animation">
+                <div class="d-flex h-100 justify-content-center align-items-center">
+                    <div class="mx-auto app-login-box col-md-8">
+                        <div class="app-logo-inverse mx-auto mb-3"></div>
+                        <div class="modal-dialog w-100 mx-auto">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <div class="h5 modal-title text-center">
+                                        <img src="assets/images/logo-inverse.png" alt="BOLT" class="page-logo">
+                                        <h4 class="mt-2">
+                                            <span class="badge badge" style="color:dimgray;">B.O.L.T Pro Web Login</span>
+                                        </h4>
+                                    </div>
+                                    <br />
+                                    <form id="frm_login" method="POST">
+                                        <input type="hidden" name="Csrf-Token" id="Csrf-Token">
+                                        <p class="lead"><input type="text" name="login" class="form-control" required
+                                                placeholder="Username" required id="login"></p>
+                                        <p class="lead"><input type="password" name="password" class="form-control" required
+                                                placeholder="Password" required id="pass" ></p>
+                                        <p class="lead btLogin"><button class="form-control btn btn-primary" required
+                                                id="btn_login" onclick="javascript:loginValidation('','','');return false;">Login</button></p>
+                                        <div class="err mx-auto" id="msg"></div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="text-center text-white opacity-8 mt-3">Copyright © Amzetta Technologies Pvt Ltd.
+                            2020</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div align="center" id="frmLodBtnDivId" class="mt-5" style="display:none;"><img src="./assets/images/ajax-loader-3.gif" /></div>	
+
+    <!-- <script type="text/javascript" src="./assets/scripts/main.js"></script> -->
+    <script>
+        $(document).ready(function(){//alert('test.......');
+            $.get('https://amzcloudbox.amzetta.co.in/token',function(res){
+                if(res != '' && res != undefined && res != 'undefined'){
+                    var tokenSplit = res.split(",");
+                    var csrfToken = tokenSplit[1].slice(0,-1);
+                    //console.log(tokenSplit);
+                    $("#Csrf-Token").val(csrfToken);
+                    localStorage.setItem("token",csrfToken)
+
+                    /*Auto login part through app*/
+                    var urlString = window.location.href;
+                    var url = new URL(urlString);
+                    var login = url.searchParams.get('login');
+                    var password = url.searchParams.get('pass');
+                    var productId = url.searchParams.get('productId');
+                    var vitalId = url.searchParams.get('vitalId');
+                    if(checkUndefined(productId) && checkUndefined(vitalId)){
+                        localStorage.setItem("productId",productId);
+                        localStorage.setItem("vitalId",vitalId);
+                     }
+
+                    /*
+                    1 - BP, 
+                    2 - SPO2, 
+                    3-  Temprature , 
+                    4 - BMI,
+                    5 - Spiro 
+                    6 - Gluco
+                    */
+                   if(localStorage.getItem("productId") && localStorage.getItem("productId") == "BG5"){
+                        $(".badge").text("B.O.L.T Gluco Web Login");
+                        $(document).prop('title', 'B.O.L.T Gluco Vitals ');
+                        $(".page-logo").attr("src","./assets/images/bolt-gluco-resizeimage.png");
+                   }
+                    var token = localStorage.getItem("token");
+                    if(checkUndefined(login) && checkUndefined(password) && checkUndefined(token)){           
+                        $("#frm_login").hide();             
+                        $("#frm_login").show().empty().html("Please wait for a while....").css({'font-size':'15px','font-weight':'bold','text-align':'center'});
+                        loginValidation(login,password,token);
+                        //return false;
+                    }
+                }
+            });
+            
+            if(getBrowserName() =="Microsoft Internet Explorer"){
+                $(".app-login-box").removeClass("mx-auto");
+            }           
+        })
+        function loginValidation(login,pass,csrfToken){
+            if(checkUndefined(login) && checkUndefined(pass)){
+               //var loginCredentials = JSON.stringify({"login":login, "password":pass});
+
+               /*
+               sample URL with encoding
+               https://amzcloudbox.amzetta.co.in/html/boltpro_webapp/index.html?login=YXJhdmluZHJ2QGdtYWlsLmNvbQ==&pass=QW16MTIzNDU2JA==
+
+               sample URL with encoding with productId and vitalId
+               https://amzcloudbox.amzetta.co.in/html/boltpro_webapp/index.html?login=YXJhdmluZHJ2QGdtYWlsLmNvbQ==&pass=QW16MTIzNDU2JA==&productId=BT2&vitalId=1
+               */
+
+               var loginCredentials = JSON.stringify({"login":atob(login), "password":atob(pass)});
+            }else{
+                var loginCredentials = JSON.stringify({"login":$("#login").val(), "password":$("#pass").val()});
+            }
+            var csrfToken = checkUndefined(csrfToken) ? csrfToken : $("#Csrf-Token").val();
+            //$("#frmLodBtnDivId").show();
+            $.ajax({
+                url:'https://amzcloudbox.amzetta.co.in/login',
+                type:"POST",
+                headers: {
+                "Content-Type": "application/json",
+                "Csrf-Token" : csrfToken,
+                },
+                data:loginCredentials,
+                dataType:'json',
+                success:function(data,txtstatus,e){ 
+                    if(data.id!=null && data.id!=undefined && data.id!='undefined' && data.id!=''){
+                        var patientName = data.firstname+" "+data.lastname;
+                        localStorage.setItem('amz-ws-header',e.getResponseHeader('amz-ws-header'));
+                        localStorage.setItem('PATIENT_NAME',patientName);
+                        localStorage.setItem('PATIENT_ID',data.id);
+                        localStorage.setItem('PATIENT_MAIL',data.login);
+                        localStorage.setItem('PATIENT_GENDER',data.gender);
+                        localStorage.setItem('PATIENT_DOB',data.dob);
+                        var genderTxt = (data.gender==1)? 'Male' : 'Female';
+                        localStorage.setItem('PATIENT_GENDER_TXT',genderTxt);
+                        var d = new Date(data.dob);
+                        var todayDate = new Date();
+                        var patientAge = todayDate.getFullYear()-d.getFullYear();
+                        localStorage.setItem('PATIENT_AGE',patientAge);
+
+                        localStorage.setItem("PATIENT_PHOTO",data.photo);
+                        //console.log(typeof data.photo);
+                        $(".app-container").hide();
+                        $("#frmLodBtnDivId").show();
+                        window.location.href='patient_vitals_history.html';
+                    }
+                },
+                error:function(error,statustxt){
+                    $("#frmLodBtnDivId").hide();
+                    $("#msg").html("Invalid User name or Password. Please enter registered Mail Id").css("color","red");
+                    localStorage.clear();
+                }
+            });
+            
+        }
+        function checkUndefined(checkVal){
+            return ( checkVal !='' && checkVal != undefined && checkVal != 'undefined' && checkVal != null && checkVal != "null") ? true: false;            
+        }
+        function getBrowserName() {
+            var test = function(regexp) {return regexp.test(window.navigator.userAgent)}
+            switch (true) {
+                case test(/edg/i): return "Microsoft Edge";
+                case test(/trident/i): return "Microsoft Internet Explorer";
+                case test(/firefox|fxios/i): return "Mozilla Firefox";
+                case test(/opr\//i): return "Opera";
+                case test(/ucbrowser/i): return "UC Browser";
+                case test(/samsungbrowser/i): return "Samsung Browser";
+                case test(/chrome|chromium|crios/i): return "Google Chrome";
+                case test(/safari/i): return "Apple Safari";
+                default: return "Other";
+            }   
+        }
+    </script>
+</html>

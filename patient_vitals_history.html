@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>B.O.L.T Pro - Patient Vitals History</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <meta name="description" content="This is an example dashboard created using build-in elements and components.">
+    <meta name="msapplication-tap-highlight" content="no">
+    <script>
+        var headerText = localStorage.getItem('amz-ws-header');
+        if(headerText =='' || headerText == undefined || headerText == 'undefined' || headerText == null){
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.flash.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <!-- <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script> -->
+    <script type="text/javascript" src="./assets/scripts/buttons.html5.min.js"></script>
+    <!-- <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.print.min.js"></script> -->
+    <script type="text/javascript" src="./assets/scripts/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.62/vfs_fonts.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="./assets/scripts/base64-images.js"></script>
+
+    <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/date-ranges-selector.css" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/jquery.ui.datepicker.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.jqueryui.min.css">
+    <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+    <link href="./bolt.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<style>
+    .ui-datepicker-trigger{
+        width: 31px;
+        height: 31px;
+        margin: 5px;
+        cursor: pointer;
+    }
+    .ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year{
+        width: 50%;
+    }
+    .list_item{
+        text-align: center;
+        font-weight: bold;
+        border: 4px solid #fff;
+        width:245px;
+        background-color: #dae0eb;
+        border-radius: 7px;
+    }
+    .list_item:hover{
+        background-color: #acb699;
+    }
+    .nav-tabs{        
+        border-bottom: 0px solid #dee2e6;
+    }
+    .nav-tabs .nav-link.active{
+        background-color: #dae0eb;
+    }
+    .nav-tabs .nav-link.activeTab{
+        background-color: #bee27a;
+    }
+    .container{
+        padding-left: 11px;
+    }
+    .navbar{
+        padding:0px;
+    }
+    #mobile_page_title{
+        display: none;
+    }
+    .patientNameSubHeading{
+        text-transform: capitalize;
+    }
+    @media only screen and (max-width: 600px) and (min-width: 300px) {
+        body {
+            background-color: lightblue;
+            /*background-image: url("assets/images/ajax-loader-3.gif");*/
+            font-size: 12px;
+        }
+        .list_item{
+            font-weight: bold;
+            border: 4px solid #fff;
+            width:245px;
+        }
+        .navbar-toggler{
+            margin-left: 16px;
+        }
+        .profileDetails{
+            margin-left: 40px;
+            font-size: 14px;
+        }
+        #mobile_page_title{
+            font-weight: bold;
+            text-align: right;
+            color:#8cb53f;
+            font-size: 18px;
+            display: block;
+            margin: 5px 60px;
+            padding: 2px 0px;
+            float: left;
+            text-decoration: underline;
+        }
+        .navbar-collapse-custom{
+            margin-left: 12px;
+        }
+    }
+</style>
+<body>
+    <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
+        <div class="app-header header-shadow">
+            <div class="app-header__logo" style="display: flex;width:100px;">
+                <div class="logo-src" style="display: flex;"></div>
+                <div class="header__pane ml-auto" style="display: none;">
+                    <div>
+                        <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
+                            data-class="closed-sidebar">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="app-header__mobile-menu">
+                <div>
+                    <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                        <span class="hamburger-box">
+                            <span class="hamburger-inner"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="app-header__menu">
+                <div class="widget-content-wrapper" style="display: block;">
+                    <div class="widget-content-left">
+                        <div class="widget-heading" style="font-weight: bold;text-align: right;color: blue;">
+                            Welcome
+                        </div>
+                        <div class="widget-subheading patientNameSubHeading" style="position: sticky;">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-header__content">
+                <div class="app-header-right">
+                    <div class="header-btn-lg pr-0">
+                        <div class="widget-content p-0">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left  ml-3 header-user-info">
+                                    <div id="pageTitleId" class="widget-heading" style="font-weight: bold;text-align: right;color:#8cb53f;font-size: 25px;">
+                                        Patient Vitals History
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-header-right">
+                    <div class="header-btn-lg pr-0">
+                        <div class="widget-content p-0">
+                            <div class="widget-content-wrapper">
+                                <div class="widget-content-left  ml-3 header-user-info">
+                                    <div class="widget-heading" style="font-weight: bold;text-align: right;color: blue;">
+                                        Welcome
+                                    </div>
+                                    <div class="widget-subheading patientNameSubHeading">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-main">
+            <div class="app-sidebar sidebar-shadow">
+                <div class="app-header__logo">
+                    <div class="logo-src"></div>
+                    <div class="header__pane ml-auto">
+                        <div>
+                            <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
+                                data-class="closed-sidebar">
+                                <span class="hamburger-box">
+                                    <span class="hamburger-inner"></span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-header__mobile-menu">
+                    <div>
+                        <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="app-header__menu">
+                    <span>
+                        <button type="button"
+                            class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                            <span class="btn-icon-wrapper">
+                                <i class="fa fa-ellipsis-v fa-w-6"></i>
+                            </span>
+                        </button>
+                    </span>
+                </div>
+                <!-- todo -->
+                <div class="scrollbar-sidebar">
+                    <div class="app-sidebar__inner">
+                        <ul class="vertical-nav-menu">
+                            <li class="app-sidebar__heading">User Management</li>
+                            <li id="patientVital-li">
+                                <a href="patient_vitals_history.html" id="patient_vitals_history" class="mm-active">
+                                    <i class="metismenu-icon pe-7s-graph2"></i>
+                                    Patient Vitals History
+                                </a>
+                            </li>
+                            <li id="downloadSpiro-li">
+                                <a href="javascript:void(0);" id="download_spiro_report" onclick="downloadSpiroReport($(this));">
+                                    <i class="metismenu-icon pe-7s-cloud-download"></i>
+                                    Download Spiro Report
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" id="my_details"  onclick="userDetails();">
+                                    <i class="metismenu-icon pe-7s-id"></i>
+                                    My details
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" id="logout_menu"  data-target="#lougoutModal"  data-toggle="modal"><!--onclick="logout();"-->
+                                    <i class="metismenu-icon pe-7s-back-2"></i>
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="app-main__outer">
+                <div class="app-main__inner">
+                    <div class="app-page-title">
+                        <div class="page-title-wrapper">
+                            <div class="page-title-heading row col-sm-12">
+                                
+                                <div id="mobile_page_title">Patient Vitals History</div>
+                                <div class="row col-sm-12" id="userDetailsDiv" style="display: none;">
+                                    <div class="col-sm-6">
+                                        <div class="text-center">
+                                            <img src=""
+                                                class="avatar img-circle img-thumbnail" alt="avatar" width="200" height="200">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" style="text-align: left;padding-top:10px;">
+                                        <p class="profileDetails">
+                                            <i class="nav-link-icon fa fa-user"></i>
+                                            <span id="patientNameId" style="text-transform: capitalize;"></span>
+                                        </p>
+                                        <p class="profileDetails">
+                                            <i class="nav-link-icon fa" style="font-size: 32px;"></i>
+                                            <span id="patientGenderId"></span>
+                                        </p>
+                                        <p class="profileDetails">
+                                            <i class="nav-link-icon fa fa-calendar"></i>
+                                            <span id="patientAgeId"></span>
+                                        </p>
+                                        <p class="profileDetails">
+                                            <i class="nav-link-icon fa fa-envelope"></i>
+                                            <span  id="patientMailId"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row col-sm-12" id="dateSelectionDiv">
+                                    <div class="form-group input-group col-sm-5">
+                                        <div class="input-group-prepend" style="height:38px;">
+                                            <span class="input-group-text"> <i class="fa fa-calendar-day"></i> </span>
+                                        </div>
+                                        <input type="hidden" name="Csrf-Token" id="Csrf-Token">
+                                        <input name="" class="form-control" name="fromDate" id="fromDate" placeholder="From Date" type="text" disabled>
+                                    </div>
+                                    <div class="form-group input-group col-sm-5">
+                                        <div class="input-group-prepend"  style="height:38px;">
+                                            <span class="input-group-text"> <i class="fa fa-calendar-day"></i> </span>
+                                        </div>
+                                        <input name="" class="form-control" name="toDate" id="toDate" placeholder="To Date" type="text" disabled>                                        
+                                    </div>
+                                    <div class="form-group col-sm-2 justify-content-center" style="display: none;" id="download_spiro_report_btn_div">
+                                        <input class="btn btn-secondary btn-sm btn-md btn-lg" name="download_spiro_report_button" id="download_spiro_report_button" value="Get results" type="button" style="display: none;" onclick="downloadSpiroReport($(this));">
+                                    </div>
+                                </div>
+                                <div id="vitalsButtonsDiv" style="border-radius: 10px;">
+                                    <nav class="navbar navbar-expand-md navbar-light">
+                                        <div class="container">
+                                            <button type="button" class="navbar-toggler dropdown-toggle" data-toggle="collapse" data-target="#navbarCollapse"  style="background-color: #34b1eb;font-weight:bold;color: white;border: 1px solid #34b1eb;">
+                                                <span>Select vitals</span>
+                                            </button>
+                                            <div class="collapse navbar-collapse navbar-collapse-custom" id="navbarCollapse">                      
+                                                <ul class="nav nav-tabs" style="border-radius: 10px;"><!--body-tabs body-tabs-layout tabs-animated body-tabs-animated-->
+                                                    <li  id="bpTab" class="nav-item list_item">
+                                                        <a role="tab" class="nav-link justify-content-md-center justify-content-sm-center justify-content-xs-center font-weight-bold" id="tab-0" data-toggle="tab" onclick="getPatientVitals($(this),'tempbp','','')" style="color:cadetblue;">
+                                                            <!-- <span onclick="getPatientVitals($(this),'tempbp','','')" >Blood Pressure</span> -->
+                                                            Blood Pressure &nbsp;&nbsp;&nbsp;
+                                                            <img src="./assets/images/blood-pressure.png">
+                                                        </a>
+                                                    </li>
+                                                    <li  id="spo2Tab" class="nav-item list_item">
+                                                        <a role="tab" class="nav-link justify-content-md-center justify-content-sm-center justify-content-xs-center font-weight-bold" id="tab-1" data-toggle="tab" onclick="getPatientVitals($(this),'temppulseoximeter','','')"  style="color:cadetblue;">
+                                                            <!-- <span onclick="getPatientVitals($(this),'temppulseoximeter','','')">SPO2</span> -->
+                                                            SPO2 &nbsp;&nbsp;&nbsp;
+                                                            <img src="./assets/images/pulse_oximeter_new.jpg" style="width:32px;height:32px;">
+                                                        </a>
+                                                    </li>
+                                                    <li  id="tempTab" class="nav-item list_item">
+                                                        <a role="tab" class="nav-link justify-content-md-center justify-content-sm-center justify-content-xs-center font-weight-bold" id="tab-2" data-toggle="tab" onclick="getPatientVitals($(this),'temptemperature','','')"  style="color:cadetblue;">
+                                                            <!-- <span onclick="getPatientVitals($(this),'temptemperature','','')">Temperature</span> -->
+                                                            Temperature &nbsp;&nbsp;&nbsp;
+                                                            <img src="assets/images/thermometer.png">
+                                                        </a>
+                                                    </li>
+                                                    <li id="bmiTab" class="nav-item list_item">
+                                                        <a role="tab"   class="nav-link justify-content-md-center justify-content-sm-center justify-content-xs-center font-weight-bold" id="tab-3" data-toggle="tab" onclick="getPatientVitals($(this),'tempbodymassindex','','')"  style="color:cadetblue;">
+                                                            <!-- <span onclick="getPatientVitals($(this),'tempbodymassindex','','')">BMI</span> -->
+                                                            BMI &nbsp;&nbsp;&nbsp;
+                                                            <img src="assets/images/bmi.png">
+                                                        </a>
+                                                    </li>
+                                                    <li id="glucoTab" class="nav-item list_item">
+                                                        <a role="tab"   class="nav-link justify-content-md-center justify-content-sm-center justify-content-xs-center font-weight-bold" id="tab-4" data-toggle="tab" onclick="getPatientVitals($(this),'glucometer','','')"  style="color:cadetblue;">
+                                                            Glucometer &nbsp;&nbsp;&nbsp;
+                                                            <img src="assets/images/glucometer.png">
+                                                        </a>
+                                                    </li>
+                                                    <!-- <li class="nav-item list_item">
+                                                        <a role="tab" class="nav-link justify-content-md-center justify-content-sm-center justify-content-xs-center font-weight-bold" id="tab-4" data-toggle="tab" onclick="getPatientVitals($(this),'spirometer','','')">
+                                                            <span onclick="getPatientVitals($(this),'spirometer','','')">Spirometer</span> 
+                                                            Spirometer
+                                                        </a>
+                                                    </li> -->
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </nav>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="VitalDateRangeTxt" class="h6 font-weight-bold mt-4">  </p>
+                    <div class="row">
+                        <div class="col-md-12" id="vitalDataTable" style="width: 700px;overflow-x: auto;margin-bottom: 100px;">
+                            <table id="example" class="cell-border compact stripe display nowrap" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                    </tr>                                    
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-weight-bold text-center">Select the date range to view vitals</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center" role="status" id="frmLodBtnDivId" style="display:none;width: 1100px;">
+                            <div  class="spinner-border" ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="lougoutModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p><h6>Do you want to logout?</h6></p><button type="button" class="close" data-dismiss="modal" onclick="logout($(this));">&times;</button>
+                </div>
+                <!-- <div class="modal-body">
+                    <p><h6>Do you want to logout?</h6></p>
+                </div> -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" onclick="logout($(this));" >Ok</button>
+                    <button type="button" class="btn btn-info btn-sm"  data-dismiss="modal" onclick="logout($(this));">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="alerDateRange" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p><h6>Please select date range</h6></p><button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- <div class="modal-body"><p><h6>Please select date range</h6></p></div> -->
+                <div class="modal-footer">
+                    <button class="btn btn-success btn-sm" class="close" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="sessionExpModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p><h6>Session expired</h6></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="minimumDateRange" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p><h6>Please select minimum date range (5 to 7 days)</h6></p><button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- <div class="modal-body"><p><h6>Please select date range</h6></p></div> -->
+                <div class="modal-footer">
+                    <button class="btn btn-success btn-sm" class="close" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        "use strict";
+        $(document).ready(function() {
+
+
+            //alert($(window).width());
+
+            if($(window).width()>600){
+                ($(".nav-link a").hasClass("justify-content-sm-center"))?
+                    $(".nav-link a").removeClass("justify-content-sm-center").addClass("justify-content-md-center"):$(".nav-link a").removeClass("justify-content-md-center").addClass("justify-content-sm-center")
+                
+            }else{
+                if($(".nav-link a").hasClass("justify-content-md-center")){
+                    $(".nav-link a").removeClass("justify-content-md-center").addClass("justify-content-sm-center")
+                }
+
+            }
+            var productId = localStorage.getItem('productId');
+            var vitalId = localStorage.getItem('vitalId');
+            if(checkUndefined(productId) && checkUndefined(vitalId)){
+                $(".list_item, #downloadSpiro-li").hide();
+                switch(productId){
+                    case "BT1": 
+                        $("#bpTab, #bmiTab").show();
+                        //$("#spo2Tab, #tempTab, #downloadSpiro-li, #glucoTab").hide();
+                        break;
+                    case "BT2":
+                        $("#bpTab, #tempTab, #bmiTab").show();
+                        //$("#spo2Tab, #downloadSpiro-li, #glucoTab").hide();
+                        break;
+                    case "BT3":
+                        $("#bpTab, #spo2Tab, #bmiTab").show();
+                        //$("#tempTab, #downloadSpiro-li, #glucoTab").hide();
+                        break;
+                    case "BT4":
+                        $("#bpTab, #spo2Tab, #tempTab, #bmiTab").show();
+                        //$("#downloadSpiro-li, #glucoTab").hide();
+                        break;
+                    case "BS1":
+                        $("#patientVital-li, #glucoTab").hide();
+                        $("#downloadSpiro-li").show();
+                        $("#download_spiro_report").click();
+                        break;
+                    case "BG5":
+                        $("#glucoTab, #bmiTab").show();   
+                        $(document).prop('title', 'B.O.L.T Gluco - Patient Vitals History');
+                        $(".app-header__logo, .logo-src").css({
+                            "background":"url('./assets/images/bolt-gluco-resizeimage.png') no-repeat"});
+                        //$("#bpTab, #spo2Tab, #tempTab, #downloadSpiro-li").hide(); 
+                    default: "";
+                }
+                if(vitalId == 1){
+                    $("#tab-0").addClass("activeTab");
+                }else if(vitalId == 2){
+                    $("#tab-1").addClass("activeTab");
+                }else if(vitalId == 3){
+                    $("#tab-2").addClass("activeTab");
+                }else if(vitalId == 4){
+                    $("#tab-3").addClass("activeTab");
+                }else if(vitalId == 5){
+                    //$("#bmiTab").addClass("activeTab");
+                } else if(vitalId == 6){
+                    $("#tab-4").addClass("activeTab");
+                }
+            }
+            var headerText = localStorage.getItem('amz-ws-header');
+            //alert("headerText" + headerText);
+            var PATIENT_ID = localStorage.getItem('PATIENT_ID');
+            //alert("PATIENT_ID" + PATIENT_ID);
+            var PATIENT_NAME = localStorage.getItem('PATIENT_NAME');
+            var PATIENT_MAIL=localStorage.getItem('PATIENT_MAIL');
+            $(".patientNameSubHeading").html(PATIENT_NAME);
+            
+            if(headerText=='' || headerText==undefined || headerText=='undefined'){
+                //alert('Session expired');
+                $("#sessionExpModal").modal({backdrop: "static"});
+                window.location.href="index.html";
+            }else{   
+                //getPatientVitals('tempbp',PATIENT_ID,headerText);
+                $.get('https://amzcloudbox.amzetta.co.in/token',function(res){
+                    if(checkUndefined(res)){
+                        var tokenSplit = res.split(",");
+                        var csrfToken = tokenSplit[1].slice(0,-1);
+                        $("#Csrf-Token").val(csrfToken);
+                    }
+                });
+            }
+            $('#example').DataTable( {
+                bDestroy: true,
+                sorting:false,
+                paging:false,
+                searching:false,
+                dom: 'Bfrtip',
+                buttons: [],
+                info: false
+            } );
+            $( "#fromDate" ).datepicker({
+                showOn: 'button', 
+                buttonImageOnly: true, 
+                buttonImage: './assets/images/calendar.gif',
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd',
+                onClose: function( selectedDate ) {
+                    $('#fromDate').css({ 'z-index': 0  } );
+                    $("#toDate" ).datepicker( "option", "minDate", selectedDate );
+
+                },
+                maxDate: 0,
+                buttonText: "From Date"
+            });
+            $( "#toDate" ).datepicker({
+                showOn: 'button', 
+                buttonImageOnly: true, 
+                buttonImage: './assets/images/calendar.gif',
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd',
+                onClose: function( selectedDate ) {
+                    $( "#fromDate" ).datepicker( "option", "maxDate", selectedDate );
+                },
+                maxDate: 0,
+                buttonText: "To Date"
+            });
+        } );
+
+        function getPatientVitals(tableNameProp,tablename,PATIENT_ID,headerText){
+            var fromDateVal = $("#fromDate").val()
+            var toDateVal = $("#toDate").val()
+            
+            if(checkUndefined(fromDateVal) && checkUndefined(toDateVal)){
+                //alert('inside loop');
+                //if($(".nav-link  a").hasClass("active")){ alert('has class active');
+                    $(".nav-link").removeClass("active activeTab");
+                //}
+                if(checkUndefined(tableNameProp)){
+                    //tableNameProp.closest('a').addClass('active');
+                    tableNameProp.addClass('activeTab');
+                    var VitalTxt = tableNameProp.text().trim();
+                }else{
+                    var VitalTxt = 'Spirometer';
+                }
+                $("#frmLodBtnDivId").show();
+                $("#vitalDataTable").hide();
+                // var session_From_Date_Val = sessionStorage.getItem('fromDate');
+                // var session_To_Date_Val = sessionStorage.getItem('toDate');
+                if(sessionStorage.getItem(tablename)){
+                    var session_Vital_Data = JSON.parse(sessionStorage.getItem(tablename));
+                    var session_From_Date_Val = session_Vital_Data.fromDate;
+                    var session_To_Date_Val = session_Vital_Data.toDate;
+                    console.log("session from date:  ", session_Vital_Data.fromDate);
+                    if( checkUndefined(session_From_Date_Val) && checkUndefined(session_To_Date_Val) ){
+                        if(session_From_Date_Val == fromDateVal && session_To_Date_Val == toDateVal) {
+                            
+                            //return sessionStorage.getItem(tablename);
+                            //var session_Vital_Data = JSON.parse(sessionStorage.getItem(tablename));
+                            var vitalTitle = VitalTxt +" Details for the period "+ fromDateVal + " to "+ toDateVal;
+                            //$(document).prop('title', vitalTitle);
+                            return formDataTable(session_Vital_Data, vitalTitle);
+                            
+                        }
+                    }
+                }
+
+
+
+
+
+                var tableName=tablename;
+                var fromDate,toDate;
+                // var fromDateSelected = $("#fromDate").val();
+                // var toDateSelected = $("#toDate").val();
+                if(fromDateVal !='' && toDateVal!=''){
+                    fromDate = fromDateVal+" 00:00:00";
+                    toDate = toDateVal+" 23:00:00";
+                }
+                var addWhereCondotion='';
+                if(PATIENT_ID=='' || headerText=='' || PATIENT_ID==undefined || headerText==undefined){
+                    var headerText = localStorage.getItem('amz-ws-header');
+                    var PATIENT_ID = localStorage.getItem('PATIENT_ID');
+                }
+                var columnsList={
+                                tempbp: "Createddatadate, bp_pulse, bp_systole, bp_diastole", 
+                                tempbodymassindex: "Createddatadate, heightfeet, heightcm, weightkg, weightlbs, bmi", 
+                                temppulseoximeter: "Createddatadate, sp_pulse, sp_spo2", 
+                                temptemperature: "Createddatadate, temp_celsius, temp_fahrenheit", 
+                                spirometer: "Createddatadate, spiro_post_pre_flag, spiro_fvc, spiro_pef, spiro_fev1", 
+                                spirometer_report: "Createddatadate,  spiro_post_pre_flag, spiro_report",
+                                glucometer: "Createddatadate,  glucose_level_mgdl, glucose_level_mmol,  meal_status",
+                                // glucose_adc, glucose_celcius, glucose_device_type,glucose_strip_type, glucose_volt,temperature_adc
+                            };//spiro_report
+                if(tableName=='spirometer' || tableName=='spirometer_report'){
+                    addWhereCondotion = " and spiro_post_pre_flag IN (0,1)";
+                }
+                if(tableName=='spirometer_report'){
+                    tableName = "spirometer";
+                }
+                
+                $.ajax({
+                    url:'https://amzcloudbox.amzetta.co.in/select',
+                    method:"POST",
+                    data:JSON.stringify({"id":PATIENT_ID,"table":tableName,"columns":columnsList[tablename],"where":"Createddatadate>= "+"\'"+fromDate+"\'"+" and Createddatadate<="+"\'"+toDate+"\'"+addWhereCondotion,"orderby": "createddatadate desc" }),
+                    contentType:'application/json',
+                    headers:{'Content-Type':'application/json','AMZ-WS-Header':headerText,"Csrf-Token" : $("#Csrf-Token").val()},
+                    responseType: 'blob',
+                    success:function (res,txtstatus,e){
+                        if(checkUndefined(res)){
+                            var vitalData = JSON.parse(res);
+                            // if(tablename === 'spirometer_report'){
+                            //     return vitalData;
+                            // }
+                            vitalData.fromDate = fromDateVal;
+                            vitalData.toDate = toDateVal;
+                            //console.log(typeof vitalData.data);
+                            //console.log("vitalData obj ", vitalData);
+                            //console.log("data length:  " , vitalData.data.length);
+                            localStorage.setItem('amz-ws-header',e.getResponseHeader('amz-ws-header'));
+                            if(vitalData.status=="OK" && vitalData.status!=''){
+                                if(vitalData.data.length > 10 && tableName == "spirometer"){
+                                    //alert("Please select minimum date range");
+                                    $("#minimumDateRange").modal({backdrop: "static"});
+                                    $("#frmLodBtnDivId").hide();
+                                    $("#vitalDataTable").show();
+                                }else{
+                                    var vitalTitle = VitalTxt +" Details for the period "+ fromDateVal + " to "+ toDateVal;
+                                    //$(document).prop('title', vitalTitle);    
+                                    sessionStorage.setItem(tablename,JSON.stringify(vitalData));
+                                    formDataTable(vitalData , vitalTitle);
+                                }
+                            }
+                        }   
+                    },
+                    error:function(err,txtstatus,e){
+                        //alert('Session expired');
+                        $("#sessionExpModal").modal({backdrop: "static"});
+                        window.location.href="index.html";
+                    }
+                })
+            }else{
+                //alert("Please select date range");
+                //$("#alerDateRange").modal('show');
+                $('#alerDateRange').modal("show");
+                
+            }        
+        }
+        function formDataTable(vitalData, vitalTitle){console.log('table ---> ',vitalData.table)
+            var tableName = vitalData.table;
+            //var vitalTitle = $(document).attr('title');
+            var appendTh = "";
+            var appendTbody = "";
+            var theadArr = [];
+            var tableData = vitalData.data;
+            //console.log(tableData);
+            appendTbody += "<tbody>";
+            if (tableData.length > 0) {
+                //var colspanVal = (Object.keys(tableData[0]).length) + 1;
+                var colspanVal = (Object.keys(tableData[0]).length);
+                //appendTh += `<thead><tr><th style='text-align: center;' colspan=` + colspanVal + `>${vitalTitle}</th></tr><tr><th>S.no</th>`;
+                //appendTh += "<thead><tr><th style='text-align: center;' colspan=" + colspanVal + ">" + vitalTitle + "</th></tr><tr><th>S.no</th>";
+                appendTh += "<thead><tr><th style='text-align: center;' colspan=" + colspanVal + ">" + vitalTitle + "</th></tr><tr>";
+            } else {
+                //appendTh += `<thead><th style='text-align: center;' >${vitalTitle}</th><tr><th></th>`;
+                    appendTh += "<thead><th style='text-align: center;' >" + vitalTitle +"</th><tr><th></th>";
+            }
+            var buttonShow = true;
+            var pre_or_post, spiroDate;
+            $.each(tableData, function(index, value) {
+                appendTbody += "<tr>";
+                //appendTbody += "<td>" + (index + 1) + "</td>";
+                $.each(value, function(ind, val) {
+
+                    if (theadArr.indexOf(ind) === -1) {
+                        theadArr.push(ind);
+                        var split_title = '';
+                        var spli_txt;
+                        if (ind == 'createddatadate') {
+                            split_title = 'Created Date' + '</br>' + '(yyyy-mm-dd h:m:s)';
+                        } else if (ind == 'spiro_fvc' || ind == 'spiro_fev1' || ind == 'spiro_pef') {
+                            spli_txt = ind.split('_');
+                            split_title = spli_txt[1].toUpperCase() + '</br>' + '(l)';
+                            if (ind == 'spiro_pef') {
+                                split_title = spli_txt[1].toUpperCase() + '</br>' + '(l/s)';
+                            }
+                        } else if (ind == 'spiro_post_pre_flag') {
+                            //split_title = ind.split('_').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+                            split_title = "PRE or POST";
+                        } else {
+                            console.log(`ind value: ${ind}`);
+                            if(ind.includes("_") && tableName !='glucometer'){
+                                spli_txt = ind.split('_');
+                                console.log(`spli_txt value: ${spli_txt}`);
+                                split_title = spli_txt[1].charAt(0).toUpperCase() + spli_txt[1].slice(1);
+                            }else{
+                                //heightfeet, heightcm, weightkg, weightlbs, bmi
+                                //glucose_strip_type, glucose_volt, meal_status, temperature_adc
+                                let dbCoumnsRename = { "heightfeet" : "Height" , "heightcm" : "Height", "weightkg" : "Weight", "weightlbs" : "Weight", "bmi" : "BMI", "glucose_adc" : "Glucose ADC", "glucose_celcius" : "Glucose Celcius", "glucose_device_type" : "Device Type", "glucose_level_mgdl" : "Glucose Level", "glucose_level_mmol" : "Glucose Level", "glucose_strip_type" : "Strip Type", "glucose_volt" : "Glucose Volt", "meal_status" : "Meal Status", "temperature_adc" : "Temperature ADC" };
+                                split_title = dbCoumnsRename[ind];
+                            }
+
+                            if (ind == 'bp_pulse') {
+                                split_title = split_title + '</br>' + '(bpm)';
+                            } else if (ind == 'bp_diastole' || ind == 'bp_systole') {
+                                split_title = split_title + '</br>' + '(mmHg)';
+                            } else if (ind == 'heightcm') {
+                                split_title = split_title + '</br>' + '(cm)';
+                            } else if (ind == 'heightfeet') {
+                                split_title = split_title + '</br>' + '(ft.)';
+                            } else if (ind == 'weightkg') {
+                                split_title = split_title + '</br>' + '(kgs)';
+                            } else if (ind == 'weightlbs') {
+                                split_title = split_title + '</br>' + '(lbs)';
+                            } else if (ind == 'sp_pulse') {
+                                split_title = split_title + '</br>' + '(bpm)';
+                            } else if (ind == 'sp_spo2') {
+                                split_title = split_title + '</br>' + '(%)';
+                            } else if (ind == 'temp_celsius') {
+                                split_title = split_title + '</br>' + '(°C)';
+                            } else if (ind == 'temp_fahrenheit') {
+                                split_title = split_title + '</br>' + '(°F)';
+                            } else if (ind == 'glucose_level_mgdl') {
+                                split_title = split_title + '</br>' + '(mg/dL)';
+                            } else if (ind == 'glucose_level_mmol') {
+                                split_title = split_title + '</br>' + '(mmol/L)';
+                            }
+                        }
+                        appendTh += "<th>" + split_title + "</th>";
+                    }
+                    var regEx = /^(\w{4}-\w{2}-\w{2})/;
+                    if (typeof val === "string") {
+                        var split_val = val.split(' ');
+                        if (split_val[0].match(regEx)) {
+                            val = val.slice(0, -4);
+                            if(tableName == 'spirometer'){    
+                                var month_name = function(dt){
+                                    var monthlist = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+                                    return dt.getDate()+"_"+monthlist[dt.getMonth()]+"_"+dt.getFullYear();
+                                };
+                                spiroDate = month_name(new Date(split_val[0]));
+                                console.log("spiroDate", spiroDate);
+                                console.log("split_val 0 ", split_val[0]);
+                                //console.log("date object ", new Date(split_val[0]));
+                            }
+                        }                        
+                    }
+                    if (typeof val === "number" && (val === 1 || val === 0) && ind !='glucose_adc') {
+                        //val = (val ===1)?"<div style='width:25px;height:25px;background-color:blue;'>&nbsp;</div>":"<div style='width:25px;height:25px;background-color:green;'>&nbsp;</div>";
+                        val = (tableName == "spirometer")?((val === 1) ? "POST" : "PRE") : ((val === 1) ? "After Meal" : "Before Meal");
+                        pre_or_post = val;
+                    }
+                    if (ind == 'spiro_report' && typeof val == "string") {
+                        buttonShow = false;
+                        var pdfHexString = val.substring(2);
+
+                        val = "<a download='spiro_report_" + spiroDate +"_"+pre_or_post + ".pdf' id='downloadlink_" + index + "' style='cursor:pointer;' ><img src='./assets/images/pdf_image.png' style='width:50px;height:50px;'></a>";
+
+                        appendTbody += "<td>" + val + "</td>";
+
+                        $('#example').on('click', '#downloadlink_' + index, function() {
+                            spiro_report_creation(index, pdfHexString)
+                        });
+
+                    } else {
+                        appendTbody += "<td>" + val + "</td>";
+                    }
+                })
+                appendTbody += "</tr>";
+            });
+            appendTbody += "</tbody>";
+            appendTh += "</tr></thead>";
+            if ($.fn.DataTable.isDataTable("#example")) {
+                $('#example').DataTable().clear().destroy();
+            }
+            $("#example thead,tbody").remove();
+            $("#example").append(appendTh);
+            $("#example").append(appendTbody);
+            if (tableData.length > 0) {
+                var patient_gender = (getLocalStorage('PATIENT_GENDER')==1) ? "Male" : "Female";
+                var patinetInfo = "Patient's Name: " + getLocalStorage('PATIENT_NAME')+ "           Age: "+getLocalStorage('PATIENT_AGE') + "           Gender: " + patient_gender;
+                var productId = localStorage.getItem('productId');
+                if(buttonShow){  
+                    if($(window).width()<768){ //alert("less than 768", $(window).width())
+                        $('#example').DataTable({
+                            bDestroy: true,
+                            dom: 'Bfrtip',
+                            "pageLength": 10,
+                            "lengthMenu": [
+                                [5, 10, 25, 50, -1],
+                                [5, 10, 25, 50, "All"]
+                            ],
+                            buttons: [
+                                'pageLength', 
+                                {
+                                    extend: 'print',
+                                    customize: function(win) {
+                                        if(productId == "BG5" && (tableName == "glucometer" || tableName == "tempbodymassindex")){
+                                            $(win.document.body)
+                                            .prepend(
+                                                '<img src=" '+ boltgluco +' ">'
+                                            );
+                                            $(win.document.body).find('thead tr').css({'background-color':'#789bd6','color':'#fff'});
+                                            
+                                            $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
+                                                $(this).css('background-color','#D0D0D0');
+                                            });
+                                        } 
+                                        else{
+                                            $(win.document.body)
+                                            .prepend(
+                                                '<img src=" '+ boltpro +' ">'
+                                            );
+                                            $(win.document.body).find('thead tr').css({'background-color':'#789bd6','color':'#fff'});
+                                            
+                                            $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
+                                                $(this).css('background-color','#D0D0D0');
+                                            });
+                                        }
+                                    },
+                                    
+                                    exportOptions: {
+                                        stripHtml: true
+                                    },
+                                    title: vitalTitle
+                                },
+
+                                {
+                                extend: 'excelHtml5',
+                                messageTop: patinetInfo, 
+                                customize: function(xlsx) {
+                                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                                        // jQuery selector to add a border
+                                        //$('row c[r*="1"]', sheet).attr( 's', '25' );
+                                        $('row:first c', sheet).attr( 's', '19' );
+                                        //$('row:first c', sheet).attr( 's', '51' );
+                                        $('c[r=A2]', sheet).attr( 's', '23' );
+                                        //$('row:second c', sheet).attr( 'image', 'https://amzcloudbox.amzetta.co.in/html/boltpro_webapp/assets/images/logo.png' );
+
+                                        },
+                                    //extension:'.xlsx',
+                                    filename:vitalTitle,
+                                    title: vitalTitle,
+
+                                },
+                                {
+                                    extend: 'pdfHtml5',
+                                    messageTop : patinetInfo ,
+                                    title: vitalTitle,
+                                    customize: function ( doc ) {
+                                        if(productId == "BG5" && (tableName == "glucometer" || tableName == "tempbodymassindex")){
+                                            doc.content.splice( 1, 0, {
+                                                margin: [ 0, 0, 0, 12 ],
+                                                alignment: 'left',
+                                                image: boltgluco
+                                            } );
+                                        }else{
+                                            doc.content.splice( 1, 0, {
+                                                margin: [ 0, 0, 0, 12 ],
+                                                alignment: 'left',
+                                                image: boltpro
+                                            } );
+                                        }                                        
+                                    } 
+                                }
+                            ],
+                            "order": [
+                                [0, "desc"],
+                            ],                        
+                            scrollX: true,
+                        });
+                    }
+                    else{ //alert("greater than 768", $(window).width())
+                        $('#example').DataTable({
+                        bDestroy: true,
+                        dom: 'Bfrtip',
+                        "pageLength": 10,
+                        "lengthMenu": [
+                            [5, 10, 25, 50, -1],
+                            [5, 10, 25, 50, "All"]
+                        ],
+                        responsive: true,
+                        buttons: [
+                            'pageLength', 
+                            {
+                                extend: 'print',
+                                title: vitalTitle,
+                                customize: function(win) {
+                                    $(win.document.body).find('h1').remove();
+                                    if(productId == "BG5" && (tableName == "glucometer" || tableName == "tempbodymassindex")){
+                                        $(win.document.body)
+                                        .prepend(
+                                            '<img src=" '+ boltgluco +' ">'
+                                        );
+                                        $(win.document.body).find('thead tr').css({'background-color':'#789bd6','color':'#fff'});
+                                        
+                                        $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
+                                            $(this).css('background-color','#D0D0D0');
+                                        });
+                                    } 
+                                    else{
+                                        $(win.document.body)
+                                        .prepend(
+                                            '<img src=" '+ boltpro +' ">'
+                                        );
+                                        $(win.document.body).find('thead tr').css({'background-color':'#789bd6','color':'#fff'});
+                                        
+                                        $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
+                                            $(this).css('background-color','#D0D0D0');
+                                        });
+                                    }
+                                },
+                                
+                                exportOptions: {
+                                    stripHtml: false
+                                }
+                            },
+
+                            
+                            {
+                            extend: 'excelHtml5',
+                            messageTop : patinetInfo, 
+                            customize: function(xlsx) {
+                                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                                    // jQuery selector to add a border
+                                    //$('row c[r*="1"]', sheet).attr( 's', '25' );
+                                    $('row:first c', sheet).attr( 's', '19' );
+                                    //$('row:first c', sheet).attr( 's', '51' );
+                                    $('c[r=A2]', sheet).attr( 's', '23' );
+                                    //$('row:eq(3) c', sheet).html( 'https://amzcloudbox.amzetta.co.in/html/boltpro_webapp/assets/images/logo.png' );
+                                 },
+                                //extension:'.xlsx',
+                                filename:vitalTitle,
+                                title: vitalTitle,
+                                "render": function (  data, type, full, meta ) {
+         
+         if(data)
+           return '<img height="25" class="zoom" src="https://amzcloudbox.amzetta.co.in/html/boltpro_webapp/assets/images/logo-l.png"/>';
+         else
+               return '<img height="25" class="zoom" src="https://amzcloudbox.amzetta.co.in/html/boltpro_webapp/assets/images/logo-l.png"/>';
+                
+           }
+
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                title: vitalTitle,
+                                messageTop : patinetInfo , 
+                                customize: function ( doc ) {
+                                    if(productId == "BG5" && (tableName == "glucometer" || tableName == "tempbodymassindex")){
+                                        doc.content.splice( 1, 0, {
+                                            margin: [ 0, 0, 0, 12 ],
+                                            alignment: 'left',
+                                            image: boltgluco
+                                        } );
+                                    }else{
+                                        doc.content.splice( 1, 0, {
+                                            margin: [ 0, 0, 0, 12 ],
+                                            alignment: 'left',
+                                            image: boltpro
+                                        } );
+                                    }
+                                }
+                            }
+                        ],
+                        "order": [
+                            [0, "desc"],
+                        ],       
+                    });
+                    }                                
+                }else{                    // alert("button hide ", $(window).width())
+                    if($(window).width()<768){
+                        $('#example').DataTable({
+                            bDestroy: true,
+                            dom: 'Bfrtip',
+                            "pageLength": 10,
+                            "lengthMenu": [
+                                [5, 10, 25, 50, -1],
+                                [5, 10, 25, 50, "All"]
+                            ],
+                            buttons: [],
+                            "order": [
+                                [0, "desc"],
+                            ],
+                            scrollX: true,
+                        });
+                    }else{
+                        $('#example').DataTable({
+                            bDestroy: true,
+                            dom: 'Bfrtip',
+                            "pageLength": 10,
+                            "lengthMenu": [
+                                [5, 10, 25, 50, -1],
+                                [5, 10, 25, 50, "All"]
+                            ],
+                            buttons: [],
+                            "order": [
+                                [0, "desc"],
+                            ],
+                        });
+                    }
+                }
+            } 
+            else {
+                if($(window).width()<768){
+                    $('#example').DataTable({
+                        bDestroy: true,
+                        dom: 'Bfrtip',
+                        buttons: [],
+                        scrollX: true,
+                        bPaginate: false,
+                        bFilter: false,
+                        ordering: false,
+                        info: false
+                    });
+                }else{
+                    $('#example').DataTable({
+                        bDestroy: true,
+                        dom: 'Bfrtip',
+                        buttons: [],
+                        bPaginate: false,
+                        bFilter: false,
+                        ordering: false,
+                        info: false
+                    });
+                }
+            }
+            //$('.btn').removeAttr('class').addClass('btn btn-primary m-2');
+            $("#" + tableName).removeAttr('class').addClass('btn btn-success m-2');
+            $("#frmLodBtnDivId").hide();
+            $("#vitalDataTable").show();
+        }
+        function logout(buttonProp){
+            // alert('logout called');
+            // console.log('logout called in console');
+            var clikckedBtn = buttonProp.text().trim();
+            //let logoutConfirm = confirm ("Do you want to logout from this page?");
+            if(clikckedBtn == "Ok"){               
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href='index.html';
+            }else { 
+                $("#logout_menu").removeClass("mm-active");
+                $("#logout_menu").css("background-color","#fff");
+                //$(".modal").removeClass("show");
+                //$(".modal-backdrop, .modal").hide();
+                //$("body").removeClass("modal-open");
+                customizeDesign();
+            }
+        }
+        function hexStringToByteArray(str) {
+            var result=[];
+            while (str.length >= 8) { 
+                result.push(parseInt(str.substring(0, 8), 16));
+
+                str = str.substring(8, str.length);
+            }
+            return result;
+        }
+        function userDetails(){   
+            customizeDesign();
+            $(document).prop('title', 'B.O.L.T Pro - My Details');                           
+            $("#pageTitleId,#mobile_page_title").html("My Details");     
+            var PATIENT_NAME = localStorage.getItem('PATIENT_NAME');
+            var PATIENT_MAIL = localStorage.getItem('PATIENT_MAIL');
+            var PATIENT_G = localStorage.getItem('PATIENT_GENDER');
+            var PATIENT_DOB = parseInt(localStorage.getItem('PATIENT_DOB'));
+            var PATIENT_PHOTO = localStorage.getItem('PATIENT_PHOTO');
+            var Gender = (PATIENT_G==1) ? "Male" : "Female";
+            var d = new Date(PATIENT_DOB);
+            var bDate = (d.getDate()<10)? '0' + d.getDate():d.getDate();
+            var bMonth = (d.getMonth()<10)? '0' + (d.getMonth()+1):(d.getMonth()+1);
+            var DOB = bDate+"-"+bMonth+"-"+d.getFullYear();
+            var todayDate = new Date();
+            var patientAge = todayDate.getFullYear()-d.getFullYear();
+
+            $("#dateSelectionDiv, #vitalsButtonsDiv,#vitalDataTable").hide();
+            $("#patientNameId").text(PATIENT_NAME);
+            $("#patientGenderId").text(Gender);
+            var genderIcon  = (PATIENT_G==1)?'fa-male':'fa-female';
+            $("#patientGenderId").prev("i").addClass(genderIcon);
+            $("#patientAgeId").text(DOB+" ("+patientAge+" Years)");
+            $("#patientContactId").text(PATIENT_NAME);
+            $("#patientMailId").text(PATIENT_MAIL);
+            $("#userDetailsDiv").show();
+            $("#my_details").addClass("mm-active");
+            $("#patient_vitals_history,#download_spiro_report").removeClass("mm-active");
+            if(checkUndefined(PATIENT_PHOTO)){
+                var patient_photo_base64 = hexToBase64(PATIENT_PHOTO.substr(2));
+                $(".avatar").attr('src',"data:image/png;base64,"+patient_photo_base64);
+            }else{
+                (PATIENT_G==1) ?  $(".avatar").attr('src',"./assets/images/avatars/avatar-male.png") : $(".avatar").attr('src',"./assets/images/avatars/empty-avatar-female.png")
+            }
+                    
+        }
+        function hexToBase64(imageHexString) {
+            return btoa(imageHexString.match(/\w{2}/g).map(function(a) {
+                return String.fromCharCode(parseInt(a, 16));
+            }).join(""));
+        }
+        function downloadSpiroReport(elementProp){
+            //console.log(elementProp);
+            //alert(elementProp.attr('id'));
+            customizeDesign();
+            $("#pageTitleId, #mobile_page_title").html("Download Spiro Report")
+            if(elementProp.attr('id') == "download_spiro_report"){
+                $("#fromDate, #toDate").val('');
+                $("#fromDate, #toDate").datepicker( "option" , {
+                    minDate: null,
+                    maxDate: 0
+                } );
+            }
+            $(document).prop('title', 'B.O.L.T Pro - Download Spiro Report');
+            $("#patient_vitals_history, #my_details").removeClass("mm-active");
+            $("#download_spiro_report").addClass("mm-active");
+            $("#vitalsButtonsDiv, #userDetailsDiv").hide();
+            $("#dateSelectionDiv, #vitalDataTable, #download_spiro_report_button, #download_spiro_report_btn_div").show();
+            
+            
+            if ($.fn.DataTable.isDataTable("#example")) {
+                $('#example').DataTable().clear().destroy();
+                $('#example thead').hide();
+            }
+            $('#example').DataTable({
+                bPaginate: false,
+                bFilter: false,
+                ordering: false,
+                info: false
+            });
+            // if($(window).width()<768){
+            //         $('#example').DataTable();
+            //     }else{
+            //         $('#example').DataTable();
+            // }
+            //$("#download_spiro_report_button").css('display','visible');
+            //console.log(sessionStorage.getItem('spirometer'));
+
+            var fromDateVal = $("#fromDate").val()
+            var toDateVal = $("#toDate").val()
+            var headerText = localStorage.getItem('amz-ws-header');
+            var PATIENT_ID = localStorage.getItem('PATIENT_ID');
+            //var columnsList={spirometer:"Createddatadate,spiro_post_pre_flag,spiro_report"};//spiro_report
+            if( checkUndefined(fromDateVal)  && checkUndefined(toDateVal) && elementProp.attr('id') == "download_spiro_report_button"){
+                var spirometer_report_result = getPatientVitals('','spirometer_report',PATIENT_ID,headerText)
+            }
+            else if(elementProp.attr('id') == "download_spiro_report_button"){
+                //alert("Please select date range");
+                //return false;
+                $("#alerDateRange").modal({backdrop: "static"});
+            }
+            //console.log( spirometer_report_result );
+            //formDataTable(spirometer_report_result);
+            
+        }
+        function spiro_report_creation(indexVal, hexString) {
+            var link = document.getElementById('downloadlink_'+indexVal);
+            //console.log(hexString);
+            var arrByte = hexStringToByte(hexString);
+            //console.log('arrByte-', arrByte);
+            saveByteArray(link, arrByte);
+        }
+        function hexStringToByte(str) {
+            if (!str) {
+            return new Uint8Array();
+            }
+            var a = [];
+            for (var i = 0, len = str.length; i < len; i+=2) {
+                a.push(parseInt(str.substr(i, 2), 16));
+            }
+            return new Uint8Array(a);
+        }
+        function saveByteArray(link, byte) {
+            var blob = new Blob([byte]);
+            link.href = window.URL.createObjectURL(blob);
+        }
+        function checkUndefined(checkVal){
+            return ( checkVal !='' && checkVal != undefined && checkVal != 'undefined' && checkVal != null && checkVal != "null") ? true: false;            
+        }
+        function customizeDesign(){
+            $(".app-container").removeClass("sidebar-mobile-open");
+            $(".mobile-toggle-nav").removeClass("is-active");
+        }
+        function getLocalStorage(data){
+            return localStorage.getItem(data);
+        }
+        function printTestFun(){
+            alert('d');
+        }
+    </script>
+
+</body>
+
+</html>
